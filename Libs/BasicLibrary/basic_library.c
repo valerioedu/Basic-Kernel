@@ -62,3 +62,46 @@ void printf(const char *format, ...) {
 
     va_end(args);
 }
+
+void scanf(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    while (*format) {
+        if (*format == '%') {
+            format++;
+            if (*format == 'd') {
+                int *num = va_arg(args, int *);
+                char num_str[11];
+                read(num_str, 11);
+                int i = 0;
+                int sign = 1;
+                if (num_str[i] == '-') {
+                    sign = -1;
+                    i++;
+                }
+                *num = 0;
+                while (num_str[i] != '\0') {
+                    *num = *num * 10 + num_str[i] - '0';
+                    i++;
+                }
+                *num *= sign;
+            } else if (*format == 's') {
+                char *str = va_arg(args, char *);
+                read(str, 100);
+            }
+        }
+        format++;
+    }
+
+    va_end(args);
+}
+
+void panic(char *message) {
+    write("Kernel panic: ");
+    write(message);
+    write("\n");
+    while (1) {
+        asm("wfi");
+    }
+}
