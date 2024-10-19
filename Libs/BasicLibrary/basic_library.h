@@ -3,5 +3,6 @@
 
 void write(char *str);
 void read(char *buffer, int size);
+void printf(const char *format, ...);
 
 #endif

@@ -1,0 +1,23 @@
+CC = aarch64-none-elf-gcc
+CFLAGS = -Wall -O2 -ffreestanding -nostdlib
+LDFLAGS = -T linker.ld -lgcc
+
+OBJS = bootloader.o uart.o basic_library.o vsnprintf.o
+
+all: kernel.img
+
+kernel.img: $(OBJS)
+    $(CC) $(CFLAGS) -o kernel.elf $(OBJS) $(LDFLAGS)
+    aarch64-none-elf-objcopy -O binary kernel.elf kernel.img
+
+bootloader.o: Bootloader.s
+    $(CC) $(CFLAGS) -c Bootloader.s -o bootloader.o
+
+uart.o: uart.c uart.h
+    $(CC) $(CFLAGS) -c uart.c -o uart.o
+
+basic_library.o: basic_library.c basic_library.h
+    $(CC) $(CFLAGS) -c basic_library.c -o basic_library.o
+
+clean:
+    rm -f *.o *.elf *.img
