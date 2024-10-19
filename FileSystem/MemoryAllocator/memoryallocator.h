@@ -56,4 +56,7 @@ uint64_t sp = 0x1FFFFFFFF;                              //first stack pointer
 size_t process_count = 0;                             //process count
 Process** process_list = NULL;                          //process list
 
+void* mmalloc(size_t size);
+void ffree(size_t* size);
+
 #endif

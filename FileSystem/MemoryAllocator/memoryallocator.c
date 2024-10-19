@@ -1,9 +1,50 @@
 #include "memoryallocator.h"
 #include "../Libs/BasicLibrary/basic_library.h"
 
+#define HEAP_SIZE 64*1024*1024                          //Usually it'd be 1/64 of the size, however I think 64mb is enough
+
+static uint16_t heap[HEAP_SIZE];                        //Heap array
+static size_t heap_index = 0;                           //Heap index
+
+static uint8_t stack[2*HEAP_SIZE];                        // Stack array, for simplicity it is 2x size of the heap
+static size_t stack_index = HEAP_SIZE;                  // Stack index at the end of the stack
+
+void* mmalloc(size_t size) {
+    if (heap_index + size > HEAP_SIZE) {
+        panic("Memory size exceeds the heap size\n");
+    }                                                   //check if the memory size exceeds the heap size
+    void* ptr = &heap[heap_index];
+    heap_index += size;
+    return ptr;
+}
+
+void ffree(size_t size) {
+    if (heap_index >= size) {
+        heap_index -= size;
+    } else {
+        panic("Invalid size\n");
+    }
+}
+
+void stack_free(size_t size) {
+    if (stack_index + size <= 2*HEAP_SIZE) {
+        stack_index += size;
+    } else {
+        panic("Invalid size\n");
+    }
+}
+
+void* stack_alloc(size_t size) {
+    if (stack_index < size) {
+        panic("Stack size exceeds the allocated stack size\n");
+    }
+    stack_index -= size;
+    return &stack[stack_index];
+}
+
 void dynamic_stack_pointer_allocation(Stack** sp_ptr) {
     if (*sp_ptr != NULL) {
-        free(*sp_ptr);
+        ffree(*sp_ptr);
     }                                                   //free the old stack pointer
     *sp_ptr = (Stack*)malloc(sizeof(Stack));
     if (*sp_ptr == NULL) {
@@ -16,8 +57,8 @@ void dynamic_stack_pointer_allocation(Stack** sp_ptr) {
     (*sp_ptr)->end_address = sp;
     if ((*sp_ptr)->end_address == NULL || (*sp_ptr)->end_address > RAM_SIZE) {
         panic("Failed to allocate memory to the stack pointer\n");
-        free(*sp_ptr);
-        free(sp_ptr);
+        ffree(*sp_ptr);
+        ffree(sp_ptr);
         *sp_ptr = NULL;;
     }                                                   //check if the memory is allocated
     (*sp_ptr)->next = NULL;
