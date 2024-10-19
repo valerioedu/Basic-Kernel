@@ -13,6 +13,6 @@ void init_ttbr() {
 
 int main() {
     init_ttbr();
-    printf("ttbr0: %x\n", ttbr[0].ttbr0); // debug line
+    printf("ttbr0: %x\n", ttbr[0].ttbr0);
     return 0;
 }

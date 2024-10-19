@@ -1,23 +1,26 @@
-CC = aarch64-none-elf-gcc
-CFLAGS = -Wall -O2 -ffreestanding -nostdlib
+CC = aarch64-elf-gcc
+CFLAGS = -Wall -O2 -ffreestanding -nostdlib -I./Libs/BasicLibrary
 LDFLAGS = -T linker.ld -lgcc
 
-OBJS = bootloader.o uart.o basic_library.o vsnprintf.o
+OBJS = bootloader.o uart.o basic_library.o kernelmain.o
 
 all: kernel.img
 
 kernel.img: $(OBJS)
-    $(CC) $(CFLAGS) -o kernel.elf $(OBJS) $(LDFLAGS)
-    aarch64-none-elf-objcopy -O binary kernel.elf kernel.img
+	$(CC) $(CFLAGS) -o kernel.elf $(OBJS) $(LDFLAGS)
+	aarch64-elf-objcopy -O binary kernel.elf kernel.img
 
-bootloader.o: Bootloader.s
-    $(CC) $(CFLAGS) -c Bootloader.s -o bootloader.o
+bootloader.o: /Bootloader_&_assembly_code/Bootloader.s
+	$(CC) $(CFLAGS) -c /Bootloader_&_assembly_code/Bootloader.s -o bootloader.o
 
-uart.o: uart.c uart.h
-    $(CC) $(CFLAGS) -c uart.c -o uart.o
+uart.o: ./Libs/BasicLibrary/uart.c ./Libs/BasicLibrary/uart.h
+	$(CC) $(CFLAGS) -c ./Libs/BasicLibrary/uart.c -o uart.o
 
-basic_library.o: basic_library.c basic_library.h
-    $(CC) $(CFLAGS) -c basic_library.c -o basic_library.o
+basic_library.o: ./Libs/BasicLibrary/basic_library.c ./Libs/BasicLibrary/basic_library.h ./Libs/BasicLibrary/stdarg.h
+	$(CC) $(CFLAGS) -c ./Libs/BasicLibrary/basic_library.c -o basic_library.o
+
+kernelmain.o: /KernelMain/kernelmain.c
+	$(CC) $(CFLAGS) -c /KernelMain/kernelmain.c -o kernelmain.o
 
 clean:
-    rm -f *.o *.elf *.img
+	rm -f *.o *.elf *.img

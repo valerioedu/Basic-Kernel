@@ -4,7 +4,7 @@
 //  max memory size 8GB
 //
 
-.equ UART0_BASE, 0x3F201000
+.equ UART0_BASE, 0x7E201000
 .equ UARTDR, UART0_BASE + 0x00
 .equ UARTFR, UART0_BASE + 0x18
 .equ UARTIBRD, UART0_BASE + 0x24
@@ -12,7 +12,7 @@
 .equ UARTLCR_H, UART0_BASE + 0x2C
 .equ UARTCR, UART0_BASE + 0x30
 
-.equ KERNEL_SIZE, 0x800000
+.equ KERNEL_SIZE, 0x8000000
 .equ KERNEL_SRC_ADDR, 0x80000000
 .equ KERNEL_DST_ADDR, 0x80000
 
@@ -34,16 +34,10 @@ _start:
     bl copy
     br x3
 
-msg_start:
-    .asciz "Bootloader started\n"
-
 error_handler:
     ldr x0, =msg_error
     bl uart_print
     wfi
-
-msg_error:
-    .asciz "Failed to load the Kernel\n"
 
 verify_kernel:
     mov x4, x1
@@ -53,7 +47,7 @@ verify_kernel:
 verify_loop:
     cbz x4, verify_end
     ldrb w7, [x5], #1
-    add x6, x6, w7
+    add x6, x6, w7, uxtb
     sub x4, x4, #1
     b verify_loop
 
@@ -79,7 +73,7 @@ copy_end:
     ret
 
 EXPECTED_SIZE:
-    .word // kernel size
+    .word 0x8000000 //replace with kernel size
 
 uart_init:
     ldr x1, =UARTCR
@@ -92,7 +86,7 @@ uart_init:
     mov w0, #40
     str w0, [x1]
     ldr x1, =UARTLCR_H
-    mov w0, #0(0x3 << 5)
+    mov w0, #(0x3 << 5)
     str w0, [x1]
     ldr x1, =UARTCR
     mov w0, #(1 << 0 | 1 << 8 | 1 << 9)
@@ -117,3 +111,11 @@ uart_print_wait:
     
 uart_print_end:
     ret
+
+.section .rodata:
+    
+msg_start:
+    .asciz "Bootloader started\n"
+
+msg_error:
+    .asciz "Failed to load the Kernel\n"
