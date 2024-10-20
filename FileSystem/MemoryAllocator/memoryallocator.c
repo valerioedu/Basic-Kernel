@@ -6,7 +6,7 @@
 static uint16_t heap[HEAP_SIZE];                        //Heap array
 static size_t heap_index = 0;                           //Heap index
 
-static uint8_t stack[2*HEAP_SIZE];                        // Stack array, for simplicity it is 2x size of the heap
+static uint8_t stack[2*HEAP_SIZE];                      // Stack array, for simplicity it is 2x size of the heap
 static size_t stack_index = HEAP_SIZE;                  // Stack index at the end of the stack
 
 void* mmalloc(size_t size) {
@@ -127,6 +127,4 @@ void dynamic_memory_allocation(uint64_t size, ProcessPriority priority) {
     * This is a simple stack pointer and memory allocator program that i wrote some days ago.
     *
     * I only changed exit(1) to panic()
-    * 
-    * However, I need to implement a malloc and free functions
 */
