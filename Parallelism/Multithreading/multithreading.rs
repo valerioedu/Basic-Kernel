@@ -51,3 +51,10 @@ impl Scheduler {
         self.threads.push(thread);
     }
 }
+
+pub enum Threads {
+    Thread_one,
+    Thread_two,
+    Thread_three,
+    Thread_four
+}

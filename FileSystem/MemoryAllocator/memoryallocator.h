@@ -3,6 +3,7 @@
 
 #include "../Libs/BasicLibrary/int.h"
 #include "../Libs/BasicLibrary/basic_library.h"
+#include "../../Parallelism/Scheduler/Process/process.h"
 
 #define RAM_SIZE 8589934592                             //ram size of the raspberry pi 5
 #define PAGES_SIZE 4096                                 //size of a page of the block of memory
@@ -34,14 +35,14 @@ typedef enum {
     MAXPRIORITY,                                        //max priority
 } ProcessPriority;
 
-typedef struct Process {
-    uint64_t pid;                                       //process identifier
-    uint64_t size;                                      //memory size of the process
-    ProcessState state;                                 //state of the process
-    ProcessPriority priority;                           //priority of the process
-    Page* pages;                                        //pages of the process(size/PAGES_SIZE)
-    struct Process* next;                               //next process
-} Process;
+//typedef struct Process {
+//    uint64_t pid;                                       //process identifier
+//    uint64_t size;                                      //memory size of the process
+//    ProcessState state;                                 //state of the process
+//    ProcessPriority priority;                           //priority of the process
+//    Page* pages;                                        //pages of the process(size/PAGES_SIZE)
+//    struct Process* next;                               //next process
+//} Process;
 
 typedef struct Stack {
     uint64_t* sp;                                       // Stack pointer

@@ -19,8 +19,30 @@ void dynamic_process_list() {
         process_capacity = RAM_SIZE / PAGES_SIZE;
         process_list = (Process**)mmalloc(process_capacity * sizeof(Process*));
     } else {
-        //TODO: Implement dynamic process list
-        process_capacity *= 2; // just for testing
+        int empty_slot = 0;
+        for (int i = 0; i < process_capacity; i++) {
+            if (process_list[0] != NULL) {
+                process_count++;
+                continue;
+            }
+            if (process_list[i] == process_list[i-1] && i > 0) {
+                continue;
+            } 
+            if (process_list[i] != process_list[i-1] && i > 0) {
+                process_count++;
+            }
+            if (process_list[i] == NULL) {
+                empty_slot = 1;
+                Process** new_process_list = (Process**)mmalloc((process_count +(RAM_SIZE - i * PAGES_SIZE)) / PAGES_SIZE * sizeof(Process*));
+                ffree(process_list);
+                process_list = new_process_list;
+                ffree(new_process_list);
+                break;
+            }
+            if (!empty_slot) {
+                panic("Ram is already full\n");
+            }
+        }
     }
 }
 
@@ -69,6 +91,7 @@ Process* create(uint64_t pid, uint64_t size, ProcessPriority priority, void (*en
         temp->next = process;
     }
     process_list[process_count++] = process;
+    dynamic_process_list();
     return process;
 }
 
@@ -96,4 +119,55 @@ void destroy(Process* process) {
     }
 
     ffree(sizeof(process));
+    dynamic_process_list();
+}
+
+void save_context(struct context* ctx) {
+    asm volatile(
+        "str x19, [%0, #0]\n"
+        "str x20, [%0, #8]\n"
+        "str x21, [%0, #16]\n"
+        "str x22, [%0, #24]\n"
+        "str x23, [%0, #32]\n"
+        "str x24, [%0, #40]\n"
+        "str x25, [%0, #48]\n"
+        "str x26, [%0, #56]\n"
+        "str x27, [%0, #64]\n"
+        "str x28, [%0, #72]\n"
+        "str x29, [%0, #80]\n"
+        "str x30, [%0, #88]\n"
+        "mov %1, sp\n"
+        "str %1, [%0, #96]\n"
+        : : "r"(ctx), "r"(ctx->sp) : "memory"
+    );
+}
+
+void restore_context(struct context* ctx) {
+    asm volatile(
+        "ldr x19, [%0, #0]\n"
+        "ldr x20, [%0, #8]\n"
+        "ldr x21, [%0, #16]\n"
+        "ldr x22, [%0, #24]\n"
+        "ldr x23, [%0, #32]\n"
+        "ldr x24, [%0, #40]\n"
+        "ldr x25, [%0, #48]\n"
+        "ldr x26, [%0, #56]\n"
+        "ldr x27, [%0, #64]\n"
+        "ldr x28, [%0, #72]\n"
+        "ldr x29, [%0, #80]\n"
+        "ldr x30, [%0, #88]\n"
+        "ldr %1, [%0, #96]\n"
+        "mov sp, %1\n"
+        : : "r"(ctx), "r"(ctx->sp) : "memory"
+    );
+}
+
+void context_switch(Process* next) {
+    if (current_process != NULL) {
+        save_context(&current_process->ctx);
+        current_process->state = PROCESS_READY;
+    }
+    current_process = next;
+    current_process->state = PROCESS_RUNNING;
+    restore_context(&current_process->ctx);
 }

@@ -21,6 +21,22 @@ typedef enum {
     PROCESS_TERMINATED
 } ProcessState;
 
+struct context {
+    uint64_t x19;
+    uint64_t x20;
+    uint64_t x21;
+    uint64_t x22;
+    uint64_t x23;
+    uint64_t x24;
+    uint64_t x25;
+    uint64_t x26;
+    uint64_t x27;
+    uint64_t x28;
+    uint64_t x29;
+    uint64_t x30;
+    uint64_t sp;
+};
+
 typedef enum {
     ZEROPRIORITY,
     NORMALPRIORITY,
@@ -30,9 +46,12 @@ typedef enum {
 typedef struct Process {
     uint64_t pid;
     uint64_t size;
+    Process* parent;
     ProcessState state;
     ProcessPriority priority;
     Page* pages;
+    bool terminated;
+    struct context ctx;
     struct Process* next;
 } Process;
 

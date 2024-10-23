@@ -105,3 +105,15 @@ void panic(char *message) {
         asm("wfi");
     }
 }
+
+FILE *ffopen(const char *filename, char *mode) {
+    FILE *file;
+    file->name = filename;
+    file->mode = mode;
+    file->buffer = NULL;
+    file->size = 0;
+    file->position = 0;
+    file->eof = 0;
+    file->next = NULL;
+    return file;
+}

@@ -7,3 +7,7 @@
 #include "scheduler.h"
 #include "../../Libs/BasicLibrary/basic_library.h"
 
+void scheduler(Process** process_list) {
+    Process* process = process_list[0];
+    
+}

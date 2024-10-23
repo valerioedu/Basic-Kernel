@@ -128,3 +128,5 @@ void dynamic_memory_allocation(uint64_t size, ProcessPriority priority) {
     *
     * I only changed exit(1) to panic()
 */
+
+//  TODO implement the process struct defined in process.h
