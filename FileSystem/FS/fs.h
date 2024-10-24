@@ -11,6 +11,19 @@ typedef struct Node {
     struct Node* next;
 } Node;
 
+typedef struct path {
+    char* name;
+    struct path* next;
+} path;
+
+struct fs_struct {
+    int users;
+    int logs;
+    bool executed;
+    path* root_path;
+    path* current_path;
+};
+
 Node* root;
 
 void init_fs();

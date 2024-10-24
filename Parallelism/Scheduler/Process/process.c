@@ -103,7 +103,7 @@ void destroy(Process* process) {
     Page* page = process->pages;
     while (page != NULL) {
         Page* temp = page->next;
-        ffree((size_t)page);
+        ffree(page);
         page = temp;
     }
 
@@ -118,7 +118,7 @@ void destroy(Process* process) {
         }
     }
 
-    ffree(sizeof(process));
+    ffree(process);
     dynamic_process_list();
 }
 

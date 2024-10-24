@@ -53,8 +53,14 @@ typedef struct Stack {
     struct Stack* next;                                 // Next stack pointer
 } Stack;
 
+typedef struct BlockMetaData {
+    void* ptr;                                          // Pointer to the block
+    size_t size;                                        // Size of the block
+    struct BlockMetaData* next;                         // Next block
+} BlockMetaData;
+
 uint64_t sp = 0x1FFFFFFFF;                              //first stack pointer
-size_t process_count = 0;                             //process count
+size_t process_count = 0;                               //process count
 Process** process_list = NULL;                          //process list
 
 void* mmalloc(size_t size);

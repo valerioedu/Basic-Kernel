@@ -18,9 +18,42 @@ void* mmalloc(size_t size) {
     return ptr;
 }
 
-void ffree(size_t size) {
-    if (heap_index >= size) {
-        heap_index -= size;
+BlockMetaData* metadata_list = NULL;
+
+size_t get_block_size(void* ptr) {
+    if (ptr == NULL) {
+        panic("Invalid pointer\n");
+    }
+    if (ptr < (void*)&heap[0] || ptr >= (void*)&heap[HEAP_SIZE]) {
+        panic("Invalid pointer\n");
+    }
+
+    BlockMetaData* current = metadata_list;
+    while (current != NULL) {
+        if (current->ptr == ptr) {
+            return current->size;
+        }
+        current = current->next;
+    }
+
+    panic("Pointer not found in metadata\n");
+    return 0; // This line will never be reached due to panic
+}
+
+void ffree(void* ptr) {
+    if (ptr == NULL) {
+        panic("Invalid pointer\n");
+    }
+    if (ptr < &heap[0] || ptr >= &heap[HEAP_SIZE]) {
+        panic("Invalid pointer\n");
+    }                                                   //check if the pointer is valid
+    size_t block_size = get_block_size(ptr);
+
+    if (block_size == 0) {
+        panic("Invalid pointer\n");
+    }                                                   //check if the block size is valid
+    if (heap_index >= block_size) {
+        heap_index -= block_size;
     } else {
         panic("Invalid size\n");
     }

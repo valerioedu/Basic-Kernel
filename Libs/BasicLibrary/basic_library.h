@@ -24,6 +24,9 @@ typedef struct FILE {
 
 void write(char *str);
 void read(char *buffer, int size);
+void strcpy(char *dest, const char *src);
+bool strcompare(const char *str1, const char *str2);
+void exit(int status);
 
 
 #pragma GCC diagnostic push

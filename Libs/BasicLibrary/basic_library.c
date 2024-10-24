@@ -1,6 +1,7 @@
 #include "uart.h"
 #include "basic_library.h"
 #include "stdarg.h"
+#include "../FileSystem/MemoryAllocator/memoryallocator.h"
 
 void write(char *str) {
     int i = 0;
@@ -107,13 +108,51 @@ void panic(char *message) {
 }
 
 FILE *ffopen(const char *filename, char *mode) {
-    FILE *file;
-    file->name = filename;
-    file->mode = mode;
-    file->buffer = NULL;
-    file->size = 0;
-    file->position = 0;
-    file->eof = 0;
-    file->next = NULL;
+    FILE *file = (FILE *)mmalloc(sizeof(FILE));
+    if (file == NULL) {
+        panic("Failed to allocate memory to the file");
+    }
+    file->name = strdup(filename);
+    if (file->name == NULL) {
+        ffree(file);
+        panic("Failed to allocate memory to the file name");
+    }   
+    file->mode = strdup(mode);
+
     return file;
+}
+
+bool strcompare(const char *str1, const char *str2) {
+    while (*str1 && *str2) {
+        if (*str1 != *str2) {
+            return false;
+        }
+        str1++;
+        str2++;
+    }
+    return *str1 == '\0' && *str2 == '\0';
+}
+
+void exit(int status) {
+    while (1) {
+        asm("wfi");
+    }
+}
+
+strcpy(char *dest, const char *src) {
+    while (*src) {
+        *dest = *src;
+        dest++;
+        src++;
+    }
+    *dest = '\0';
+}
+
+strdup(const char *str) {
+    char *new_str = (char *)mmalloc(strlen(str) + 1);
+    if (new_str == NULL) {
+        panic("Failed to allocate memory to the string");
+    }
+    strcpy(new_str, str);
+    return new_str;
 }

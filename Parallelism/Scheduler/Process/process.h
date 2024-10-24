@@ -55,7 +55,11 @@ typedef struct Process {
     struct Process* next;
 } Process;
 
-int process_count;
+Process** process_list = NULL;
+static int process_count = 0;
+static int process_capacity = 0;
+Process* current_process = NULL;
+
 
 Process* create(uint64_t pid, uint64_t size, ProcessPriority priority, void (*entry_point)(void));
 void destroy(Process* process);
