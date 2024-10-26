@@ -1,0 +1,5 @@
+[dependencies]
+core_affinity = "0.5.10"
+
+[build-dependencies]
+cc = "1.0"

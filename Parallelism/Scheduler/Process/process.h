@@ -6,6 +6,8 @@
 
 #define RAM_SIZE 8*1024*1024*1024
 #define PAGES_SIZE 4096
+#define MAX_PROCESSES 4*32                          //32 processes per core (overkill for an os like this but anyway)
+
 
 typedef struct Page {
     uint64_t frame;
@@ -59,9 +61,16 @@ Process** process_list = NULL;
 static int process_count = 0;
 static int process_capacity = 0;
 Process* current_process = NULL;
+Process* process_list[MAX_PROCESSES];             
+Process* current_process = NULL;
 
 
 Process* create(uint64_t pid, uint64_t size, ProcessPriority priority, void (*entry_point)(void));
 void destroy(Process* process);
+void dynamic_process_list();
+void save_context(struct context* ctx);
+void restore_context(struct context* ctx);
+void context_switch(Process* next);
+Process* find_process(uint64_t pid);
 
 #endif
